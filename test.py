@@ -14,17 +14,24 @@ def input_error(func):
 def hello_func(*args, **kwargs):
     print('How can I help you?')
 
+
 @input_error
 def add_func(args, num_dict):
-    num_dict[args.name] = args.number
-    return num_dict
+    if args.name and args.number:  # Проверяем, что имя и номер были переданы
+        num_dict[args.name] = args.number
+        return f"Contact {args.name} added with phone number {args.number}"
+    else:
+        raise ValueError("Please provide both name and phone number for the contact.")
+
 
 @input_error
 def change_func(args, num_dict):
     if args.name in num_dict:
         num_dict[args.name] = args.number
+        return f"Phone number for {args.name} changed to {args.number}."
     else:
         raise KeyError(f'No such name in the dictionary!')
+
 
 @input_error
 def phone_func(args, num_dict):
@@ -33,12 +40,16 @@ def phone_func(args, num_dict):
         raise KeyError('No such name in the dictionary.')
     print(f'For the contact {args.name}, the number is {result}')
 
+
 @input_error
 def show_func(*args, **kwargs):
-    print(kwargs['num_dict'])
+    if not kwargs['num_dict']:
+        return "No contacts"
+    else:
+        return "\n".join([f"{name}: {phone}" for name, phone in kwargs['num_dict'].items()])
 
 
-COMAND_DICT = {
+COMMAND_DICT = {
     'hello': hello_func,
     'add': add_func,
     'change': change_func,
@@ -49,8 +60,8 @@ COMAND_DICT = {
 
 @input_error
 def handle_func(args, num_dict):
-    if args.command in COMAND_DICT:
-        return COMAND_DICT[args.command](args, num_dict=num_dict)
+    if args.command in COMMAND_DICT:
+        return COMMAND_DICT[args.command](args, num_dict=num_dict)
     else:
         raise KeyError('Unknown command')
 
@@ -62,15 +73,22 @@ def main():
         if command.lower() in ['good bye', 'close', 'exit']:
             print('Good bye!')
             break
+
         command_parts = command.lower().split()
-        parser = argparse.ArgumentParser(description='Assistant bot program.')
-        parser.add_argument('command', choices=COMAND_DICT.keys(), help='Available commands')
-        parser.add_argument('name', nargs='?', default='', help='Contact name')
-        parser.add_argument('number', nargs='?', default='', help='Contact number')
-        args = parser.parse_args(command_parts)
-        result = handle_func(args, num_dict)
-        if result is not None:
-            print(result)
+        command_name = command_parts[0]
+
+        if command_name in COMMAND_DICT:
+            parser = argparse.ArgumentParser(description='Assistant bot program.')
+            parser.add_argument('command', choices=COMMAND_DICT.keys(), help='Available commands')
+            parser.add_argument('name', nargs='?', default='', help='Contact name')
+            parser.add_argument('number', nargs='?', default='', help='Contact number')
+            args = parser.parse_args(command_parts)
+            result = handle_func(args, num_dict)
+            if result is not None:
+                print(result)
+        else:
+            print('Invalid command. Please try again.')
+
 
 if __name__ == '__main__':
     main()
