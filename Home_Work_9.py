@@ -12,7 +12,7 @@ def input_error(func):
 
 
 def hello_func(*args, **kwargs):
-    print('How can I help you?')
+    return ('How can I help you?')
 
 
 @input_error
@@ -38,7 +38,7 @@ def phone_func(args, num_dict):
     result = num_dict.get(args.name, None)
     if result is None:
         raise KeyError('No such name in the dictionary.')
-    print(f'For the contact {args.name}, the number is {result}')
+    return (f'For the contact {args.name}, the number is {result}')
 
 
 @input_error
