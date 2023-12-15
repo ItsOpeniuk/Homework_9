@@ -7,7 +7,7 @@ def input_error(func):
         try:
             return func(*args, **kwargs)
         except (KeyError, ValueError, IndexError) as e:
-            print(f'Error: {e}')
+            return (f'Error: {e}')
     return wrapper
 
 
